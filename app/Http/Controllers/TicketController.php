@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Ticket;
 use App\Models\User;
 use Validator;
+use App\Events\TicketEvent;
+
 
 class TicketController extends Controller
 {
@@ -55,6 +57,7 @@ class TicketController extends Controller
         $ticket = Ticket::find($request->id);
         $ticket->status = $request->status;
         $ticket->save();
+        event(new TicketEvent($ticket, 'status'));
 
         $request->session()->flash('success', __('Ticket status changed successfully.'));
         return response()->json(['success' => 'Ticket status changed successfully.']);

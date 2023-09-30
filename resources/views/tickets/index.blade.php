@@ -31,10 +31,10 @@
                             <td>
                                 <button onclick="viewTicket(this)" data-id="{{$ticket->id}}" data-toggle="modal" data-target="#myModal" class="btn btn-info">View</button>
                                 @if($ticket->status != 'Closed')
-                                <button onclick="statusTicket({{$ticket->id}},'Closed')" class="btn btn-danger">Close</button>
+                                <button onclick="statusTicket(this)" data-id="{{$ticket->id}}" data-status="Closed" class="btn btn-danger">Close</button>
                                 @endif
                                 @if($ticket->status == 'Closed')
-                                <button onclick="statusTicket({{$ticket->id}},'Pending')" class="btn btn-warning">Pending</button>
+                                <button onclick="statusTicket(this)" data-id="{{$ticket->id}}" data-status="Pending" class="btn btn-warning">Pending</button>
                                 @endif
                             </td>
                         </tr>
@@ -96,7 +96,11 @@
           }
         });
     }
-    function statusTicket(id,status) {
+    function statusTicket(_this) {
+        var id = $(_this).data('id');
+        var status = $(_this).data('status');
+
+        $(_this).html('<i class="fa fa-spinner"></i>');
         $.ajax({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
