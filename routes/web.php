@@ -20,7 +20,10 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::group(['middleware' => ['auth']], function() {
-    Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/home', 'TicketController@index')->name('home');
     Route::get('/tickets', 'TicketController@index')->name('tickets');
     Route::post('/ticket/view', 'TicketController@view')->name('ticket.view');
+    Route::get('/ticket/create', 'TicketController@create')->name('ticket.create');
+    Route::post('/ticket/store', 'TicketController@store')->name('ticket.store');
+    Route::post('/ticket/status', 'TicketController@status')->name('ticket.status');
 });

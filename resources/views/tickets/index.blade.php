@@ -4,16 +4,21 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            @if (session('status'))
+            @if (session('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ session('status') }}
+                    {{ session('success') }}
                 </div>
             @endif
         </div>
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <table class="table">
+                    <div class="col-12">
+                        <div class="float-end" style="margin-bottom:10px">
+                            <button onclick="addTicket(this)" data-toggle="modal" data-target="#myModal" class="btn btn-primary"><i class="fa fa-plus"></i> Create</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
                         <tr>
                             <th>Title</th>
                             <th>Status</th>
@@ -24,8 +29,14 @@
                             <td>{{$ticket->title}}</td>
                             <td>{{$ticket->status}}</td>
                             <td>
-                                <button onclick="viewTicket(this)" data-id="{{$ticket->id}}"  data-toggle="modal" data-target="#myModal" class="btn btn-info">View</button>
-                                <button class="btn btn-warning">Edit</button></td>
+                                <button onclick="viewTicket(this)" data-id="{{$ticket->id}}" data-toggle="modal" data-target="#myModal" class="btn btn-info">View</button>
+                                @if($ticket->status != 'Closed')
+                                <button onclick="statusTicket({{$ticket->id}},'Closed')" class="btn btn-danger">Close</button>
+                                @endif
+                                @if($ticket->status == 'Closed')
+                                <button onclick="statusTicket({{$ticket->id}},'Pending')" class="btn btn-warning">Pending</button>
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                     </table>
@@ -57,6 +68,7 @@
 @section('page-js')
 <script type="text/javascript">
     function viewTicket(_this) {
+        $('#myModal .modal-title').text('View Ticket');
         $.ajax({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -68,6 +80,32 @@
           },
           success:function(data){
             $('#myModal .modal-body').html(data);
+          }
+        });
+    }
+    function addTicket(_this) {
+        $('#myModal .modal-title').text('Create Ticket');
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'GET',
+          url:'{{route("ticket.create")}}',
+          success:function(data){
+            $('#myModal .modal-body').html(data);
+          }
+        });
+    }
+    function statusTicket(id,status) {
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type:'POST',
+          url:'{{route("ticket.status")}}',
+          data:{id:id,status:status},
+          success:function(data){
+            location.reload();
           }
         });
     }
